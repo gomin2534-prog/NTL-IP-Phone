@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      color: #202124;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+    }
+
+    .hero {
+      width: 100%;
+      min-height: 300px;
+      padding: 32px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      background:
+        linear-gradient(rgba(0, 20, 40, .28), rgba(0, 20, 40, .58)),
+        url("https://drive.google.com/thumbnail?id=1gcTs_sLS3PkZlQCsTO1SIx7Lh6BR3ZdM&sz=w1600")
+        center / cover no-repeat;
+    }
+
+    .hero-content {
+      width: 100%;
+      max-width: 900px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+    }
+
+    .hero-brand {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 8px 16px;
+      border: 1px solid rgba(255, 255, 255, .65);
+      border-radius: 4px;
+      font-size: 14px;
+      letter-spacing: 4px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 7vw, 64px);
+      letter-spacing: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .hero p {
+      margin: 0 0 22px;
+      font-size: clamp(15px, 2.5vw, 22px);
+    }
+
+    button {
+      max-width: 100%;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .hero button {
+      padding: 12px 24px;
+      color: #fff;
+      background: #c51620;
+      font-size: 16px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+    }
+
+    .nav button {
+      color: #222;
+      background: #eef1f4;
+    }
+
+    .nav button.active {
+      color: #fff;
+      background: #1769aa;
+    }
+
+    main {
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+      margin: 14px auto;
+      padding: 0 8px 24px;
+    }
+
+    .page {
+      display: none;
+      width: 100%;
+      min-width: 0;
+      padding: 16px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    }
+
+    .page.active { display: block; }
+
+    h2, h3, h4 { margin-top: 0; }
+
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 42px;
+      padding: 9px;
+      border: 1px solid #c8cdd2;
+      border-radius: 5px;
+      background: #fff;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: 12px;
+      width: 100%;
+      min-width: 0;
+      margin-bottom: 18px;
+      padding: 14px;
+      border: 1px solid #e0e4e8;
+      border-radius: 8px;
+      background: #f8fafb;
+    }
+
+    .filter-grid > div { min-width: 0; }
+    .filter-grid label { margin-top: 0; }
+    .form-block { margin-bottom: 20px; }
+
+    .primary {
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      color: #fff;
+      background: #1769aa;
+    }
+
+    .scan-button {
+      width: auto;
+      margin-top: 6px;
+      color: #fff;
+      background: #16804a;
+    }
+
+    .refresh {
+      color: #fff;
+      background: #16804a;
+    }
+
+    .message {
+      width: 100%;
+      min-height: 24px;
+      margin: 10px auto;
+      padding: 0 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .hint,
+    .empty {
+      margin: 8px 0;
+      color: #666;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .group {
+      min-width: 0;
+      margin: 10px 0;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+    }
+
+    .check-item {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      padding: 7px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .check-item input {
+      flex: 0 0 auto;
+      width: auto;
+      min-height: 0;
+    }
+
+    /* ตารางทั่วไป: เลื่อนในกรอบตาราง ไม่ดันทั้งหน้าให้กว้าง */
+    .table-wrap {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: #f1f4f6; }
+
+    .stock-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-width: 190px;
+    }
+
+    .stock-actions button {
+      padding: 7px 9px;
+      color: #fff;
+      background: #1769aa;
+      white-space: nowrap;
+    }
+
+    .stock-actions button[data-action="TRANSFER"] {
+      background: #16804a;
+    }
+
+    .stock-actions button[data-action="DELETE"] {
+      background: #c51620;
+    }
+
+    .status-select {
+      width: 170px;
+      min-width: 170px;
+      font-weight: 600;
+    }
+
+    .status-select.status-technician {
+      background: #fff2b3;
+      border-color: #e0bd45;
+      color: #5f4b00;
+    }
+
+    .status-select.status-admin {
+      background: #c8f0d2;
+      border-color: #4caf68;
+      color: #145c2a;
+    }
+
+    .ack-cell,
+    .evidence-cell {
+      min-width: 210px;
+    }
+
+    .ack-cell select,
+    .evidence-cell input[type="file"] {
+      margin-bottom: 6px;
+    }
+
+    .ack-cell button {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      margin-top: 6px;
+      border: 2px solid #0b4f8a;
+      background: #1769aa;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 3px 7px rgba(0, 0, 0, .22);
+    }
+
+    .ack-cell button:hover { background: #0b4f8a; }
+
+    .evidence-save-button {
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      margin-top: 6px;
+      background: #16804a;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .evidence-delete-button {
+      display: block;
+      width: 100%;
+      min-height: 42px;
+      margin-top: 7px;
+      background: #c51620;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .evidence-delete-button:hover { background: #9f1018; }
+
+    .ack-date {
+      display: block;
+      margin-top: 6px;
+      color: #666;
+      font-size: 12px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .evidence-link {
+      display: inline-block;
+      margin-top: 6px;
+      color: #1769aa;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    /* ตารางประวัติกว้างได้ แต่จำกัดการเลื่อนอยู่ใน table-wrap */
+    #defectTable {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    #defectTable table {
+      width: max-content;
+      min-width: 1500px;
+    }
+
+    #defectTable th,
+    #defectTable td {
+      white-space: nowrap;
+    }
+
+    .divider {
+      margin: 24px 0;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+
+    .recipient-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, .5);
+    }
+
+    .recipient-modal.open { display: flex; }
+
+    .recipient-box {
+      width: min(420px, 100%);
+      max-width: 100%;
+      padding: 20px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    }
+
+    .recipient-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .recipient-buttons button {
+      flex: 1;
+      color: #fff;
+      background: #1769aa;
+    }
+
+    .recipient-buttons .cancel-button { background: #666; }
+
+    #reader {
+      position: fixed;
+      left: -10000px;
+      top: 0;
+      width: 300px;
+      height: 300px;
+    }
+
+    @media (max-width: 700px) {
+      .hero { min-height: 250px; }
+
+      .nav {
+        justify-content: flex-start;
+        gap: 5px;
+      }
+
+      .nav button {
+        padding: 9px 10px;
+      }
+
+      main {
+        margin-top: 10px;
+        padding: 0 6px 18px;
+      }
+
+      .page {
+        padding: 12px;
+        border-radius: 7px;
+      }
+
+      .filter-grid {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 10px;
+      }
+
+      .message { padding: 0 6px; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-brand">NTL STOCK MANAGEMENT</div>
+      <h1>ระบบจัดการอุปกรณ์</h1>
+      <p>รับเข้า • ตัด Stock • ติดตาม SN และของเสีย</p>
+      <button type="button" onclick="showPage('stockPage')">เข้าสู่ระบบ</button>
+    </div>
+  </section>
+
+  <nav class="nav">
+    <button class="active" data-page="stockPage">Stock คงเหลือ</button>
+    <button data-page="receivePage">รับเข้า</button>
+    <button data-page="issuePage">ตัด Stock</button>
+    <button data-page="defectPage">ของเสีย / ติดตาม</button>
+  </nav>
+
+  <div id="message" class="message" role="status"></div>
+
+  <main>
+    <section id="stockPage" class="page active">
+      <h2>Stock คงเหลือ</h2>
+
+      <div class="filter-grid">
+        <div>
+          <label for="stockNameFilter">กรองตามชื่อ</label>
+          <select id="stockNameFilter">
+            <option value="">ทุกชื่อ</option>
+          </select>
+        </div>
+        <div>
+          <label for="stockProvinceFilter">กรองตามจังหวัด</label>
+          <select id="stockProvinceFilter">
+            <option value="">ทุกจังหวัด</option>
+          </select>
+        </div>
+        <div>
+          <label for="stockDeviceFilter">กรองตามอุปกรณ์</label>
+          <select id="stockDeviceFilter">
+            <option value="">ทุกอุปกรณ์</option>
+            <option value="Handset">Handset</option>
+            <option value="Base">Base</option>
+            <option value="Adapter">Adapter</option>
+            <option value="Batt">Batt</option>
+            <option value="แท่นชาร์จ">แท่นชาร์จ</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="stockContent">กำลังโหลดข้อมูล...</div>
+      <button type="button" class="refresh" onclick="refreshData()">รีเฟรชข้อมูล</button>
+    </section>
+
+    <section id="receivePage" class="page">
+      <h2>รับอุปกรณ์เข้า Stock</h2>
+
+      <form id="receiveForm">
+        <label for="name">ชื่อ-นามสกุล</label>
+        <select id="name" required></select>
+
+        <label for="province">จังหวัด</label>
+        <select id="province" required></select>
+
+        <div class="form-block">
+          <label for="handset">Handset SN — หนึ่ง SN ต่อหนึ่งบรรทัด</label>
+          <textarea id="handset" placeholder="กรอกหรือสแกน SN"></textarea>
+          <button type="button" class="scan-button" data-scan-target="handset">
+            ถ่ายภาพบาร์โค้ด Handset
+          </button>
+        </div>
+
+        <div class="form-block">
+          <label for="base">Base SN — หนึ่ง SN ต่อหนึ่งบรรทัด</label>
+          <textarea id="base" placeholder="กรอกหรือสแกน SN"></textarea>
+          <button type="button" class="scan-button" data-scan-target="base">
+            ถ่ายภาพบาร์โค้ด Base
+          </button>
+        </div>
+
+        <div class="form-block">
+          <label for="adapter">Adapter (จำนวน)</label>
+          <input id="adapter" type="number" min="0" step="1" value="0" required>
+        </div>
+
+        <div class="form-block">
+          <label for="batt">Batt SN — หนึ่ง SN ต่อหนึ่งบรรทัด</label>
+          <textarea id="batt" placeholder="กรอกหรือสแกน SN"></textarea>
+          <button type="button" class="scan-button" data-scan-target="batt">
+            ถ่ายภาพบาร์โค้ด Batt
+          </button>
+        </div>
+
+        <div class="form-block">
+          <label for="charger">แท่นชาร์จ (จำนวน)</label>
+          <input id="charger" type="number" min="0" step="1" value="0" required>
+        </div>
+
+        <input id="photo" type="file" accept="image/*" capture="environment" hidden>
+        <div id="reader"></div>
+        <div class="hint">ตรวจว่า SN แต่ละตัวอยู่คนละบรรทัดก่อนบันทึก</div>
+        <button class="primary" type="submit">บันทึกรับเข้า</button>
+      </form>
+    </section>
+
+    <section id="issuePage" class="page">
+      <h2>ตัด Stock ตาม Ticket</h2>
+
+      <form id="issueForm">
+        <label for="ticket">Ticket</label>
+        <input id="ticket" required placeholder="กรอกเลข Ticket">
+
+        <h3>เลือก SN ที่จะตัด</h3>
+        <div id="serialChoices"></div>
+
+        <h3>จำนวนที่จะตัด</h3>
+
+        <label for="issueAdapterName">ชื่อผู้ถือ Stock ของ Adapter</label>
+        <select id="issueAdapterName">
+          <option value="">เลือกชื่อผู้ถือ Stock</option>
+        </select>
+        <label for="issueAdapter">Adapter จำนวนที่จะตัด</label>
+        <input id="issueAdapter" type="number" min="0" step="1" value="0">
+
+        <label for="issueChargerName">ชื่อผู้ถือ Stock ของแท่นชาร์จ</label>
+        <select id="issueChargerName">
+          <option value="">เลือกชื่อผู้ถือ Stock</option>
+        </select>
+        <label for="issueCharger">แท่นชาร์จ จำนวนที่จะตัด</label>
+        <input id="issueCharger" type="number" min="0" step="1" value="0">
+
+        <button class="primary" type="submit">บันทึกการตัด Stock</button>
+      </form>
+    </section>
+
+    <section id="defectPage" class="page">
+      <h2>บันทึก SN เก่า / SN ใหม่</h2>
+
+      <form id="serialDefectForm">
+        <label for="serialTicket">Ticket</label>
+        <select id="serialTicket" required></select>
+
+        <label for="issuedSerial">SN ใหม่ที่ตัดใน Ticket</label>
+        <select id="issuedSerial" required></select>
+
+        <label for="oldSN">SN เก่า</label>
+        <input id="oldSN" required>
+
+        <label for="serialStatus">Status</label>
+        <select id="serialStatus" required>
+          <option value="อยู่ที่ช่าง">อยู่ที่ช่าง</option>
+          <option value="คืน Admin แล้ว">คืน Admin แล้ว</option>
+        </select>
+
+        <button class="primary" type="submit">บันทึก SN เก่า/ใหม่</button>
+      </form>
+
+      <hr class="divider">
+
+      <h2>บันทึกจำนวนเสีย</h2>
+
+      <form id="quantityDefectForm">
+        <label for="countTicket">Ticket</label>
+        <select id="countTicket" required></select>
+
+        <label for="countCategory">ชนิดอุปกรณ์</label>
+        <select id="countCategory" required>
+          <option value="Adapter">Adapter</option>
+          <option value="แท่นชาร์จ">แท่นชาร์จ</option>
+        </select>
+
+        <label for="badQty">จำนวนเสีย</label>
+        <input id="badQty" type="number" min="0" step="1" value="0" required>
+        <div class="hint">ระบบคำนวณจำนวนดีจากจำนวนที่ตัดลบจำนวนเสีย</div>
+
+        <label for="countStatus">Status</label>
+        <select id="countStatus" required>
+          <option value="อยู่ที่ช่าง">อยู่ที่ช่าง</option>
+          <option value="คืน Admin แล้ว">คืน Admin แล้ว</option>
+        </select>
+
+        <button class="primary" type="submit">บันทึกจำนวนเสีย</button>
+      </form>
+
+      <hr class="divider">
+
+      <h2>ประวัติของเสียและสถานะ</h2>
+
+      <div class="filter-grid">
+        <div>
+          <label for="defectSearchFilter">ค้นหา Ticket / ชื่อ / SN</label>
+          <input id="defectSearchFilter" type="search" placeholder="พิมพ์คำค้น">
+        </div>
+        <div>
+          <label for="defectCategoryFilter">ชนิดอุปกรณ์</label>
+          <select id="defectCategoryFilter">
+            <option value="">ทุกชนิด</option>
+          </select>
+        </div>
+        <div>
+          <label for="defectStatusFilter">Status</label>
+          <select id="defectStatusFilter">
+            <option value="">ทุกสถานะ</option>
+            <option value="อยู่ที่ช่าง">อยู่ที่ช่าง</option>
+            <option value="คืน Admin แล้ว">คืน Admin แล้ว</option>
+          </select>
+        </div>
+        <div>
+          <label for="defectAdminFilter">การรับทราบของ Admin</label>
+          <select id="defectAdminFilter">
+            <option value="">ทั้งหมด</option>
+            <option value="ยังไม่รับทราบ">ยังไม่รับทราบ</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="defectTable"></div>
+    </section>
+  </main>
+
+  <div id="recipientModal" class="recipient-modal" aria-hidden="true">
+    <div class="recipient-box" role="dialog" aria-modal="true">
+      <h3>เลือกชื่อผู้รับ</h3>
+      <label for="recipientSelect">ชื่อและจังหวัด</label>
+      <select id="recipientSelect"></select>
+      <div class="recipient-buttons">
+        <button type="button" id="confirmRecipient">ยืนยันผู้รับ</button>
+        <button type="button" id="cancelRecipient" class="cancel-button">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var dashboard = null;
+    var photoTarget = null;
+    var staffList = [];
+    var adminNames = [
+      'คุณ กุลยาพัชร ให้หวล',
+      'คุณ ชัชวาล สุขขาว',
+      'คุณ เรืองเกียรติ แก้วชนะ',
+      'คุณ ศิริพร บุญพรม'
+    ];
+
+    function setMessage(text) {
+      document.getElementById('message').textContent = text || '';
+    }
+
+    function errorText(error) {
+      return error && error.message ? error.message : String(error);
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char];
+      });
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.nav button').forEach(function(button) {
+        button.classList.toggle('active', button.dataset.page === pageId);
+      });
+
+      document.querySelectorAll('.page').forEach(function(page) {
+        page.classList.toggle('active', page.id === pageId);
+      });
+
+      document.querySelector('.nav').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.nav button').forEach(function(button) {
+      button.addEventListener('click', function() {
+        showPage(button.dataset.page);
+      });
+    });
+
+    function loadStaff() {
+      google.script.run
+        .withSuccessHandler(function(list) {
+          staffList = list || [];
+
+          var nameSelect = document.getElementById('name');
+          var provinceSelect = document.getElementById('province');
+
+          nameSelect.innerHTML = '<option value="">เลือกชื่อ</option>';
+          provinceSelect.innerHTML = '<option value="">เลือกจังหวัด</option>';
+
+          staffList.forEach(function(person) {
+            nameSelect.add(new Option(person.name, person.name));
+          });
+
+          Array.from(new Set(staffList.map(function(person) {
+            return person.province;
+          }))).forEach(function(province) {
+            provinceSelect.add(new Option(province, province));
+          });
+
+          nameSelect.addEventListener('change', function() {
+            var person = staffList.find(function(item) {
+              return item.name === nameSelect.value;
+            });
+            provinceSelect.value = person ? person.province : '';
+          });
+        })
+        .withFailureHandler(function(error) {
+          setMessage('โหลดรายชื่อไม่สำเร็จ: ' + errorText(error));
+        })
+        .getStaffList();
+    }
+
+    function refreshData() {
+      setMessage('กำลังโหลดข้อมูล...');
+
+      google.script.run
+        .withSuccessHandler(function(data) {
+          dashboard = data;
+          renderStockFilters();
+          renderStock();
+          renderIssueChoices();
+          renderQuantityOwnerOptions();
+          renderTicketOptions();
+          renderDefectFilters();
+          renderDefects();
+          setMessage('');
+        })
+        .withFailureHandler(function(error) {
+          setMessage('โหลดข้อมูลไม่สำเร็จ: ' + errorText(error));
+        })
+        .getDashboardData();
+    }
+
+    function renderStockFilters() {
+      var nameSelect = document.getElementById('stockNameFilter');
+      var provinceSelect = document.getElementById('stockProvinceFilter');
+      var oldName = nameSelect.value;
+      var oldProvince = provinceSelect.value;
+
+      var allItems = dashboard.stock.serials.concat(
+        dashboard.stock.quantityBatches
+      );
+
+      var names = Array.from(new Set(allItems.map(function(item) {
+        return item.name;
+      }).filter(Boolean))).sort();
+
+      var provinces = Array.from(new Set(allItems.map(function(item) {
+        return item.province;
+      }).filter(Boolean))).sort();
+
+      nameSelect.innerHTML = '<option value="">ทุกชื่อ</option>';
+      names.forEach(function(name) {
+        nameSelect.add(new Option(name, name));
+      });
+
+      provinceSelect.innerHTML = '<option value="">ทุกจังหวัด</option>';
+      provinces.forEach(function(province) {
+        provinceSelect.add(new Option(province, province));
+      });
+
+      if (names.indexOf(oldName) !== -1) nameSelect.value = oldName;
+      if (provinces.indexOf(oldProvince) !== -1) {
+        provinceSelect.value = oldProvince;
+      }
+    }
+
+    function renderStock() {
+      if (!dashboard) return;
+
+      var name = document.getElementById('stockNameFilter').value;
+      var province = document.getElementById('stockProvinceFilter').value;
+      var device = document.getElementById('stockDeviceFilter').value;
+
+      function matches(item) {
+        return (!name || item.name === name) &&
+          (!province || item.province === province) &&
+          (!device || item.category === device);
+      }
+
+      var serials = dashboard.stock.serials.filter(matches);
+      var quantities = dashboard.stock.quantityBatches.filter(matches);
+      var html = '<h3>อุปกรณ์มี SN (' + serials.length + ' รายการ)</h3>';
+
+      if (serials.length) {
+        html += '<div class="table-wrap"><table>' +
+          '<tr><th>ชื่อ</th><th>จังหวัด</th><th>ชนิด</th><th>SN</th><th>จัดการ</th></tr>';
+
+        serials.forEach(function(item) {
+          html += '<tr>' +
+            '<td>' + escapeHtml(item.name) + '</td>' +
+            '<td>' + escapeHtml(item.province) + '</td>' +
+            '<td>' + escapeHtml(item.category) + '</td>' +
+            '<td>' + escapeHtml(item.serial) + '</td>' +
+            '<td class="stock-actions">' +
+              '<button type="button" data-action="EDIT" data-kind="SERIAL" data-key="' +
+                escapeHtml(item.inventoryKey) + '" data-category="' +
+                escapeHtml(item.category) + '">แก้ไข</button>' +
+              '<button type="button" data-action="TRANSFER" data-kind="SERIAL" data-key="' +
+                escapeHtml(item.inventoryKey) + '" data-category="' +
+                escapeHtml(item.category) + '">โอน</button>' +
+              '<button type="button" data-action="DELETE" data-kind="SERIAL" data-key="' +
+                escapeHtml(item.inventoryKey) + '" data-category="' +
+                escapeHtml(item.category) + '">ลบ</button>' +
+            '</td>' +
+          '</tr>';
+        });
+
+        html += '</table></div>';
+      } else {
+        html += '<div class="empty">ไม่พบอุปกรณ์ SN ตามตัวกรองนี้</div>';
+      }
+
+      html += '<h3>อุปกรณ์แบบจำนวน</h3>';
+
+      if (quantities.length) {
+        html += '<div class="table-wrap"><table>' +
+          '<tr><th>ชื่อ</th><th>จังหวัด</th><th>ชนิด</th><th>คงเหลือ</th><th>จัดการ</th></tr>';
+
+        quantities.forEach(function(item) {
+          html += '<tr>' +
+            '<td>' + escapeHtml(item.name) + '</td>' +
+            '<td>' + escapeHtml(item.province) + '</td>' +
+            '<td>' + escapeHtml(item.category) + '</td>' +
+            '<td>' + Number(item.quantity) + '</td>' +
+            '<td class="stock-actions">' +
+              '<button type="button" data-action="EDIT" data-kind="QUANTITY" data-row="' +
+                Number(item.sourceRow) + '" data-category="' +
+                escapeHtml(item.category) + '" data-name="' +
+                escapeHtml(item.name) + '" data-province="' +
+                escapeHtml(item.province) + '" data-quantity="' +
+                Number(item.quantity) + '">แก้ไข</button>' +
+              '<button type="button" data-action="TRANSFER" data-kind="QUANTITY" data-row="' +
+                Number(item.sourceRow) + '" data-category="' +
+                escapeHtml(item.category) + '" data-name="' +
+                escapeHtml(item.name) + '" data-province="' +
+                escapeHtml(item.province) + '" data-quantity="' +
+                Number(item.quantity) + '">โอน</button>' +
+              '<button type="button" data-action="DELETE" data-kind="QUANTITY" data-row="' +
+                Number(item.sourceRow) + '" data-category="' +
+                escapeHtml(item.category) + '" data-name="' +
+                escapeHtml(item.name) + '" data-province="' +
+                escapeHtml(item.province) + '" data-quantity="' +
+                Number(item.quantity) + '">ลบ</button>' +
+            '</td>' +
+          '</tr>';
+        });
+
+        html += '</table></div>';
+      } else {
+        html += '<div class="empty">ไม่พบอุปกรณ์แบบจำนวนตามตัวกรองนี้</div>';
+      }
+
+      document.getElementById('stockContent').innerHTML = html;
+    }
+
+    document.getElementById('stockContent').addEventListener('click', function(event) {
+      var button = event.target.closest('button[data-action]');
+      if (button) handleStockAction(button);
+    });
+
+    async function handleStockAction(button) {
+      var action = button.dataset.action;
+      var kind = button.dataset.kind;
+      var data = {
+        action: action,
+        category: button.dataset.category
+      };
+
+      if (kind === 'SERIAL') {
+        data.inventoryKey = button.dataset.key;
+
+        if (action === 'EDIT') {
+          var newSerial = prompt('กรอก SN ใหม่:');
+          if (newSerial === null) return;
+
+          newSerial = newSerial.trim();
+          if (!newSerial) {
+            setMessage('กรุณากรอก SN ใหม่');
+            return;
+          }
+          data.newSerial = newSerial;
+        }
+
+        if (action === 'DELETE' &&
+            !confirm('ยืนยันลบ SN นี้ออกจาก Stock คงเหลือ?')) {
+          return;
+        }
+
+        if (action === 'TRANSFER') {
+          var recipient = await chooseStockRecipient_();
+          if (!recipient) return;
+          data.toName = recipient.name;
+          data.toProvince = recipient.province;
+        }
+      } else {
+        data.sourceRow = Number(button.dataset.row);
+        data.name = button.dataset.name;
+        data.province = button.dataset.province;
+        data.quantity = Number(button.dataset.quantity);
+
+        if (action === 'EDIT') {
+          var newQuantity = prompt(
+            'กรอกจำนวนคงเหลือใหม่:',
+            String(data.quantity)
+          );
+          if (newQuantity === null) return;
+
+          newQuantity = Number(newQuantity);
+          if (!Number.isInteger(newQuantity) || newQuantity < 0) {
+            setMessage('จำนวนคงเหลือต้องเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไป');
+            return;
+          }
+          data.quantity = newQuantity;
+        }
+
+        if (action === 'DELETE' &&
+            !confirm('ยืนยันลบจำนวนคงเหลือ ' + data.quantity + ' ออกจาก Stock?')) {
+          return;
+        }
+
+        if (action === 'TRANSFER') {
+          var transferQuantity = prompt(
+            'กรอกจำนวนที่จะโอน (คงเหลือ ' + data.quantity + '):'
+          );
+          if (transferQuantity === null) return;
+
+          transferQuantity = Number(transferQuantity);
+          if (!Number.isInteger(transferQuantity) ||
+              transferQuantity < 1 ||
+              transferQuantity > data.quantity) {
+            setMessage('จำนวนโอนไม่ถูกต้อง หรือมากกว่ายอดคงเหลือ');
+            return;
+          }
+
+          data.quantity = transferQuantity;
+          var quantityRecipient = await chooseStockRecipient_();
+          if (!quantityRecipient) return;
+          data.toName = quantityRecipient.name;
+          data.toProvince = quantityRecipient.province;
+        }
+      }
+
+      setMessage('กำลังดำเนินการ...');
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('ดำเนินการไม่สำเร็จ: ' + errorText(error));
+        })
+        .manageStockItem(data);
+    }
+
+    function chooseStockRecipient_() {
+      return new Promise(function(resolve) {
+        if (!staffList.length) {
+          setMessage('ยังโหลดรายชื่อผู้รับไม่สำเร็จ');
+          resolve(null);
+          return;
+        }
+
+        var modal = document.getElementById('recipientModal');
+        var select = document.getElementById('recipientSelect');
+        var confirmButton = document.getElementById('confirmRecipient');
+        var cancelButton = document.getElementById('cancelRecipient');
+
+        select.innerHTML = '';
+        select.add(new Option('เลือกชื่อผู้รับ', ''));
+
+        staffList.forEach(function(person, index) {
+          select.add(new Option(
+            person.name + ' — ' + person.province,
+            String(index)
+          ));
+        });
+
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+
+        function finish(result) {
+          modal.classList.remove('open');
+          modal.setAttribute('aria-hidden', 'true');
+          confirmButton.removeEventListener('click', onConfirm);
+          cancelButton.removeEventListener('click', onCancel);
+          modal.removeEventListener('click', onBackdrop);
+          resolve(result);
+        }
+
+        function onConfirm() {
+          var value = select.value;
+          var index = Number(value);
+
+          if (value === '' || !Number.isInteger(index) || !staffList[index]) {
+            setMessage('กรุณาเลือกชื่อผู้รับ');
+            return;
+          }
+
+          finish(staffList[index]);
+        }
+
+        function onCancel() {
+          finish(null);
+        }
+
+        function onBackdrop(event) {
+          if (event.target === modal) finish(null);
+        }
+
+        confirmButton.addEventListener('click', onConfirm);
+        cancelButton.addEventListener('click', onCancel);
+        modal.addEventListener('click', onBackdrop);
+      });
+    }
+
+    ['stockNameFilter', 'stockProvinceFilter', 'stockDeviceFilter']
+      .forEach(function(id) {
+        document.getElementById(id).addEventListener('change', renderStock);
+      });
+
+    function renderIssueChoices() {
+      var root = document.getElementById('serialChoices');
+      var html = '';
+
+      ['Handset', 'Base', 'Batt'].forEach(function(category) {
+        var items = dashboard.stock.serials.filter(function(item) {
+          return item.category === category;
+        });
+
+        html += '<div class="group"><strong>' +
+          escapeHtml(category) + ' (' + items.length + ')</strong>';
+
+        if (!items.length) {
+          html += '<div class="empty">ไม่มี SN คงเหลือ</div>';
+        }
+
+        items.forEach(function(item) {
+          html += '<label class="check-item">' +
+            '<input type="checkbox" class="serial-check" value="' +
+            escapeHtml(item.inventoryKey) + '">' +
+            '<span>' + escapeHtml(item.name) + ' — ' +
+            escapeHtml(item.serial) + '</span></label>';
+        });
+
+        html += '</div>';
+      });
+
+      root.innerHTML = html;
+    }
+
+    function renderQuantityOwnerOptions() {
+      [
+        { category: 'Adapter', id: 'issueAdapterName' },
+        { category: 'แท่นชาร์จ', id: 'issueChargerName' }
+      ].forEach(function(control) {
+        var select = document.getElementById(control.id);
+        var previous = select.value;
+
+        var names = Array.from(new Set(
+          dashboard.stock.quantityBatches
+            .filter(function(item) {
+              return item.category === control.category &&
+                Number(item.quantity) > 0 &&
+                String(item.name || '').trim() !== '';
+            })
+            .map(function(item) {
+              return String(item.name).trim();
+            })
+        )).sort();
+
+        select.innerHTML = '';
+        select.add(new Option(
+          names.length ? 'เลือกชื่อผู้ถือ Stock' : 'ไม่มีชื่อที่มี Stock เหลือ',
+          ''
+        ));
+
+        names.forEach(function(name) {
+          select.add(new Option(name, name));
+        });
+
+        if (names.indexOf(previous) !== -1) {
+          select.value = previous;
+        }
+      });
+    }
+
+    function renderTicketOptions() {
+      var options = '<option value="">เลือก Ticket</option>';
+
+      dashboard.tickets.forEach(function(ticket) {
+        options += '<option value="' + escapeHtml(ticket) + '">' +
+          escapeHtml(ticket) + '</option>';
+      });
+
+      document.getElementById('serialTicket').innerHTML = options;
+      document.getElementById('countTicket').innerHTML = options;
+      renderIssuedSerialOptions();
+    }
+
+    function renderIssuedSerialOptions() {
+      if (!dashboard) return;
+
+      var ticket = document.getElementById('serialTicket').value;
+      var select = document.getElementById('issuedSerial');
+      select.innerHTML = '<option value="">เลือก SN ใหม่</option>';
+
+      dashboard.issuedSerials
+        .filter(function(item) {
+          return item.ticket === ticket;
+        })
+        .forEach(function(item) {
+          select.add(new Option(
+            item.category + ' — ' + item.name + ' — ' + item.serial,
+            item.inventoryKey
+          ));
+        });
+    }
+
+    document.getElementById('serialTicket').addEventListener(
+      'change',
+      renderIssuedSerialOptions
+    );
+
+    function renderDefectFilters() {
+      if (!dashboard) return;
+
+      var categorySelect = document.getElementById('defectCategoryFilter');
+      var adminSelect = document.getElementById('defectAdminFilter');
+      var oldCategory = categorySelect.value;
+      var oldAdmin = adminSelect.value;
+
+      var categories = Array.from(new Set(
+        dashboard.defects.map(function(item) {
+          return item.category;
+        }).filter(Boolean)
+      )).sort();
+
+      categorySelect.innerHTML = '<option value="">ทุกชนิด</option>';
+      categories.forEach(function(category) {
+        categorySelect.add(new Option(category, category));
+      });
+
+      adminSelect.innerHTML =
+        '<option value="">ทั้งหมด</option>' +
+        '<option value="ยังไม่รับทราบ">ยังไม่รับทราบ</option>';
+
+      adminNames.forEach(function(name) {
+        adminSelect.add(new Option(name, name));
+      });
+
+      if (categories.indexOf(oldCategory) !== -1) {
+        categorySelect.value = oldCategory;
+      }
+
+      if (oldAdmin === 'ยังไม่รับทราบ' ||
+          adminNames.indexOf(oldAdmin) !== -1) {
+        adminSelect.value = oldAdmin;
+      }
+    }
+
+    function renderDefects() {
+      if (!dashboard) return;
+
+      var root = document.getElementById('defectTable');
+      var search = document.getElementById('defectSearchFilter')
+        .value.trim().toLowerCase();
+      var categoryFilter = document.getElementById('defectCategoryFilter').value;
+      var statusFilter = document.getElementById('defectStatusFilter').value;
+      var adminFilter = document.getElementById('defectAdminFilter').value;
+
+      var rows = (dashboard.defects || []).filter(function(item) {
+        var searchable = [
+          item.ticket, item.name, item.category, item.oldSN, item.newSN
+        ].join(' ').toLowerCase();
+
+        return (!search || searchable.indexOf(search) !== -1) &&
+          (!categoryFilter || item.category === categoryFilter) &&
+          (!statusFilter || item.status === statusFilter) &&
+          (!adminFilter ||
+            (adminFilter === 'ยังไม่รับทราบ'
+              ? !item.adminName
+              : item.adminName === adminFilter));
+      });
+
+      if (!rows.length) {
+        root.innerHTML = '<div class="empty">ไม่พบประวัติตามตัวกรอง</div>';
+        return;
+      }
+
+      var html = '<div class="table-wrap"><table><tr>' +
+        '<th>วันที่</th><th>Ticket</th><th>ชื่อ</th><th>ชนิด</th>' +
+        '<th>SN เก่า</th><th>SN ใหม่</th><th>จำนวนของเสีย</th>' +
+        '<th>Status</th><th>Admin รับทราบ</th>' +
+        '<th>ภาพหลักฐานคืนของ</th><th>บันทึก Status</th></tr>';
+
+      rows.forEach(function(item) {
+        var badQuantity = item.type === 'COUNT'
+          ? Number(item.bad || 0)
+          : '—';
+
+        var statusClass = item.status === 'คืน Admin แล้ว'
+          ? 'status-admin'
+          : 'status-technician';
+
+        var adminOptions = '<option value="">เลือกชื่อ Admin</option>';
+
+        adminNames.forEach(function(name) {
+          adminOptions += '<option value="' + escapeHtml(name) + '"' +
+            (item.adminName === name ? ' selected' : '') +
+            '>' + escapeHtml(name) + '</option>';
+        });
+
+        var evidenceInfo = item.evidenceUrl
+          ? '<a class="evidence-link" href="' +
+            escapeHtml(item.evidenceUrl) +
+            '" target="_blank" rel="noopener">เปิดภาพหลักฐาน</a>' +
+            (item.evidenceTimestamp
+              ? '<span class="ack-date">รับภาพเมื่อ ' +
+                escapeHtml(item.evidenceTimestamp) + '</span>'
+              : '') +
+            '<button type="button" class="evidence-delete-button" ' +
+              'onclick="deleteEvidence(' + item.rowNumber + ')">' +
+              'ลบภาพหลักฐาน</button>'
+          : '<span class="ack-date">ยังไม่มีภาพ</span>';
+
+        var ackInfo = item.adminName
+          ? '<span class="ack-date">รับทราบโดย ' +
+            escapeHtml(item.adminName) +
+            (item.ackDate ? '<br>' + escapeHtml(item.ackDate) : '') +
+            '</span>'
+          : '';
+
+        html += '<tr>' +
+          '<td>' + escapeHtml(item.date) + '</td>' +
+          '<td>' + escapeHtml(item.ticket) + '</td>' +
+          '<td>' + escapeHtml(item.name) + '</td>' +
+          '<td>' + escapeHtml(item.category) + '</td>' +
+          '<td>' + escapeHtml(item.oldSN) + '</td>' +
+          '<td>' + escapeHtml(item.newSN) + '</td>' +
+          '<td>' + badQuantity + '</td>' +
+          '<td><select class="status-select ' + statusClass +
+            '" id="status-' + item.rowNumber +
+            '" onchange="colorDefectStatus(this)">' +
+            '<option value="อยู่ที่ช่าง"' +
+              (item.status === 'อยู่ที่ช่าง' ? ' selected' : '') +
+            '>อยู่ที่ช่าง</option>' +
+            '<option value="คืน Admin แล้ว"' +
+              (item.status === 'คืน Admin แล้ว' ? ' selected' : '') +
+            '>คืน Admin แล้ว</option>' +
+          '</select></td>' +
+          '<td class="ack-cell">' +
+            '<select id="admin-' + item.rowNumber + '">' +
+              adminOptions +
+            '</select>' +
+            '<button type="button" onclick="saveAcknowledgement(' +
+              item.rowNumber + ')">รับทราบ</button>' +
+            ackInfo +
+          '</td>' +
+          '<td class="evidence-cell">' +
+            '<input type="file" accept="image/jpeg,image/png,image/webp" ' +
+              'capture="environment" id="evidence-' + item.rowNumber + '">' +
+            '<button type="button" class="evidence-save-button" ' +
+              'onclick="saveStatus(' + item.rowNumber + ')">' +
+              'บันทึกสถานะ / แนบภาพ</button>' +
+            evidenceInfo +
+          '</td>' +
+          '<td><button type="button" onclick="saveStatusOnly(' +
+            item.rowNumber + ')">อัปเดต Status</button></td>' +
+        '</tr>';
+      });
+
+      root.innerHTML = html + '</table></div>';
+    }
+
+    function colorDefectStatus(select) {
+      select.classList.remove('status-technician', 'status-admin');
+      select.classList.add(
+        select.value === 'คืน Admin แล้ว'
+          ? 'status-admin'
+          : 'status-technician'
+      );
+    }
+
+    function saveStatusOnly(rowNumber) {
+      var status = document.getElementById('status-' + rowNumber).value;
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('อัปเดต Status ไม่สำเร็จ: ' + errorText(error));
+        })
+        .updateDefectStatus(rowNumber, status);
+    }
+
+    function saveStatus(rowNumber) {
+      var status = document.getElementById('status-' + rowNumber).value;
+      var fileInput = document.getElementById('evidence-' + rowNumber);
+      var file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+      if (status !== 'คืน Admin แล้ว') {
+        saveStatusOnly(rowNumber);
+        return;
+      }
+
+      var defect = dashboard.defects.find(function(item) {
+        return item.rowNumber === Number(rowNumber);
+      });
+
+      if (!file && defect && defect.evidenceUrl) {
+        saveStatusOnly(rowNumber);
+        return;
+      }
+
+      if (!file) {
+        setMessage('กรุณาเลือกภาพหลักฐานก่อนบันทึกสถานะคืน Admin');
+        return;
+      }
+
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+        setMessage('รองรับภาพ JPG, PNG หรือ WebP เท่านั้น');
+        return;
+      }
+
+      if (file.size > 6 * 1024 * 1024) {
+        setMessage('ภาพมีขนาดใหญ่เกินไป กรุณาเลือกภาพไม่เกิน 6 MB');
+        return;
+      }
+
+      setMessage('กำลังขอ Timestamp จากระบบ...');
+
+      google.script.run
+        .withSuccessHandler(function(timestamp) {
+          stampEvidenceImage_(file, timestamp)
+            .then(function(stamped) {
+              setMessage('กำลังบันทึกภาพหลักฐาน...');
+
+              google.script.run
+                .withSuccessHandler(function(result) {
+                  setMessage(result.message || 'บันทึกภาพหลักฐานเรียบร้อยแล้ว');
+                  refreshData();
+                })
+                .withFailureHandler(function(error) {
+                  setMessage('บันทึกภาพไม่สำเร็จ: ' + errorText(error));
+                })
+                .saveReturnEvidence({
+                  rowNumber: Number(rowNumber),
+                  status: status,
+                  dataUrl: stamped.dataUrl,
+                  filename: stamped.filename
+                });
+            })
+            .catch(function(error) {
+              setMessage('ประทับเวลาในภาพไม่สำเร็จ: ' + errorText(error));
+            });
+        })
+        .withFailureHandler(function(error) {
+          setMessage('ขอ Timestamp ไม่สำเร็จ: ' + errorText(error));
+        })
+        .getEvidenceTimestamp();
+    }
+
+    function stampEvidenceImage_(file, timestamp) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+
+        reader.onerror = function() {
+          reject(new Error('อ่านไฟล์ภาพไม่สำเร็จ'));
+        };
+
+        reader.onload = function() {
+          var image = new Image();
+
+          image.onerror = function() {
+            reject(new Error('เปิดไฟล์ภาพไม่สำเร็จ'));
+          };
+
+          image.onload = function() {
+            try {
+              var maxSide = 1600;
+              var scale = Math.min(
+                1,
+                maxSide / Math.max(image.width, image.height)
+              );
+
+              var canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, Math.round(image.width * scale));
+              canvas.height = Math.max(1, Math.round(image.height * scale));
+
+              var context = canvas.getContext('2d');
+              context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+              var fontSize = Math.max(18, Math.round(canvas.width * 0.028));
+              var padding = Math.max(12, Math.round(fontSize * 0.65));
+              var text = 'Timestamp: ' + timestamp;
+
+              context.font = 'bold ' + fontSize + 'px Arial, sans-serif';
+
+              var textWidth = context.measureText(text).width;
+              var boxHeight = fontSize + padding * 1.6;
+              var boxWidth = Math.min(
+                canvas.width,
+                textWidth + padding * 2
+              );
+
+              context.fillStyle = 'rgba(0, 0, 0, 0.72)';
+              context.fillRect(
+                0,
+                canvas.height - boxHeight,
+                boxWidth,
+                boxHeight
+              );
+
+              context.fillStyle = '#fff';
+              context.textBaseline = 'middle';
+              context.fillText(
+                text,
+                padding,
+                canvas.height - boxHeight / 2,
+                Math.max(20, boxWidth - padding * 2)
+              );
+
+              canvas.toBlob(function(blob) {
+                if (!blob) {
+                  reject(new Error('สร้างภาพที่ประทับเวลาไม่สำเร็จ'));
+                  return;
+                }
+
+                var outputReader = new FileReader();
+
+                outputReader.onerror = function() {
+                  reject(new Error('เตรียมภาพอัปโหลดไม่สำเร็จ'));
+                };
+
+                outputReader.onload = function() {
+                  resolve({
+                    dataUrl: outputReader.result,
+                    filename: 'return-evidence-' + Date.now() + '.jpg'
+                  });
+                };
+
+                outputReader.readAsDataURL(blob);
+              }, 'image/jpeg', 0.88);
+            } catch (error) {
+              reject(error);
+            }
+          };
+
+          image.src = reader.result;
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function deleteEvidence(rowNumber) {
+      var confirmed = confirm(
+        'ยืนยันลบภาพหลักฐานนี้? สถานะจะกลับเป็น “อยู่ที่ช่าง” ' +
+        'และข้อมูลรับทราบของ Admin จะถูกล้าง'
+      );
+
+      if (!confirmed) return;
+
+      setMessage('กำลังลบภาพหลักฐาน...');
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('ลบภาพไม่สำเร็จ: ' + errorText(error));
+        })
+        .deleteReturnEvidence(rowNumber);
+    }
+
+    function saveAcknowledgement(rowNumber) {
+      var select = document.getElementById('admin-' + rowNumber);
+      var adminName = select ? select.value : '';
+
+      if (!adminName) {
+        setMessage('กรุณาเลือกชื่อ Admin ก่อนกดรับทราบ');
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('บันทึกการรับทราบไม่สำเร็จ: ' + errorText(error));
+        })
+        .acknowledgeDefect(rowNumber, adminName);
+    }
+
+    [
+      'defectSearchFilter',
+      'defectCategoryFilter',
+      'defectStatusFilter',
+      'defectAdminFilter'
+    ].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', renderDefects);
+      document.getElementById(id).addEventListener('change', renderDefects);
+    });
+
+    document.getElementById('receiveForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var data = {
+        name: document.getElementById('name').value,
+        province: document.getElementById('province').value,
+        handset: document.getElementById('handset').value,
+        base: document.getElementById('base').value,
+        adapter: document.getElementById('adapter').value,
+        batt: document.getElementById('batt').value,
+        charger: document.getElementById('charger').value
+      };
+
+      setMessage('กำลังบันทึกรับเข้า...');
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          document.getElementById('receiveForm').reset();
+          document.getElementById('adapter').value = 0;
+          document.getElementById('charger').value = 0;
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('รับเข้าไม่สำเร็จ: ' + errorText(error));
+        })
+        .submitRecord(data);
+    });
+
+    document.getElementById('issueForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var serialKeys = Array.from(
+        document.querySelectorAll('.serial-check:checked')
+      ).map(function(input) {
+        return input.value;
+      });
+
+      var data = {
+        ticket: document.getElementById('ticket').value,
+        serialKeys: serialKeys,
+        quantities: {
+          Adapter: document.getElementById('issueAdapter').value,
+          'แท่นชาร์จ': document.getElementById('issueCharger').value
+        },
+        quantityOwners: {
+          Adapter: document.getElementById('issueAdapterName').value,
+          'แท่นชาร์จ': document.getElementById('issueChargerName').value
+        }
+      };
+
+      setMessage('กำลังบันทึกการตัด Stock...');
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          document.getElementById('issueForm').reset();
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('ตัด Stock ไม่สำเร็จ: ' + errorText(error));
+        })
+        .submitIssue(data);
+    });
+
+    document.getElementById('serialDefectForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var data = {
+        ticket: document.getElementById('serialTicket').value,
+        inventoryKey: document.getElementById('issuedSerial').value,
+        oldSN: document.getElementById('oldSN').value,
+        status: document.getElementById('serialStatus').value
+      };
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          document.getElementById('serialDefectForm').reset();
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('บันทึก SN ไม่สำเร็จ: ' + errorText(error));
+        })
+        .submitSerialDefect(data);
+    });
+
+    document.getElementById('quantityDefectForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var data = {
+        ticket: document.getElementById('countTicket').value,
+        category: document.getElementById('countCategory').value,
+        bad: document.getElementById('badQty').value,
+        status: document.getElementById('countStatus').value
+      };
+
+      setMessage('กำลังบันทึกจำนวนเสีย...');
+
+      google.script.run
+        .withSuccessHandler(function(message) {
+          document.getElementById('quantityDefectForm').reset();
+          document.getElementById('badQty').value = 0;
+          setMessage(message);
+          refreshData();
+        })
+        .withFailureHandler(function(error) {
+          setMessage('บันทึกจำนวนเสียไม่สำเร็จ: ' + errorText(error));
+        })
+        .submitQuantityDefect(data);
+    });
+
+    document.querySelectorAll('[data-scan-target]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        photoTarget = document.getElementById(button.dataset.scanTarget);
+        var input = document.getElementById('photo');
+        input.value = '';
+        input.click();
+      });
+    });
+
+    document.getElementById('photo').addEventListener('change', function(event) {
+      var input = event.target;
+      var file = input.files && input.files[0];
+
+      if (!file || !photoTarget) return;
+
+      if (typeof Html5Qrcode === 'undefined') {
+        setMessage('โหลดตัวอ่านบาร์โค้ดไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต');
+        input.value = '';
+        return;
+      }
+
+      var scanner;
+
+      try {
+        scanner = new Html5Qrcode('reader', { verbose: false });
+      } catch (error) {
+        setMessage('เริ่มตัวอ่านบาร์โค้ดไม่สำเร็จ: ' + errorText(error));
+        input.value = '';
+        return;
+      }
+
+      setMessage('กำลังอ่านบาร์โค้ดจากภาพ...');
+
+      scanner.scanFile(file, false)
+        .then(function(decodedText) {
+          var serial = String(decodedText || '').trim();
+          if (!serial) throw new Error('ไม่พบ SN ในภาพ');
+
+          var lines = photoTarget.value
+            .split(/\r?\n/)
+            .map(function(line) { return line.trim(); })
+            .filter(function(line) { return line !== ''; });
+
+          if (lines.indexOf(serial) === -1) lines.push(serial);
+
+          photoTarget.value = lines.join('\n');
+          setMessage('สแกนสำเร็จ มี SN ในช่องนี้ ' + lines.length + ' รายการ');
+        })
+        .catch(function(error) {
+          setMessage('อ่านบาร์โค้ดไม่สำเร็จ: ' + errorText(error));
+        })
+        .finally(function() {
+          input.value = '';
+
+          try {
+            scanner.clear();
+          } catch (error) {
+            // ตัวอ่านอาจถูกล้างไปแล้ว
+          }
+        });
+    });
+
+    loadStaff();
+    refreshData();
+  </script>
+</body>
+</html>
